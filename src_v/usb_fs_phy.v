@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------
 //                     USB Full Speed (12mbps) Phy
-//                              V0.1
+//                              V0.2
 //                        Ultra-Embedded.com
 //                          Copyright 2015
 //
@@ -106,9 +106,9 @@ wire        bit_stuff_bit_w;
 wire        next_is_bit_stuff_w;
 
 wire        usb_reset_assert_w = usb_reset_assert_i | 
-                                (utmi_xcvrselect_i == 2'b01 && 
+                                (utmi_xcvrselect_i == 2'b00 && 
                                  utmi_termselect_i == 1'b0  && 
-                                 utmi_op_mode_i    == 2'b00 && 
+                                 utmi_op_mode_i    == 2'b10 && 
                                  utmi_dppulldown_i && 
                                  utmi_dmpulldown_i);
 
@@ -199,7 +199,8 @@ assign in_k_w       = in_se0_w ? 1'b0 : ~rxd_q;
 assign in_se0_w     = (!rx_dp_q & !rx_dn_q);
 assign in_invalid_w = (rx_dp_q & rx_dn_q);
 
-assign utmi_linestate_o = {rx_dn_q, rx_dp_q};
+// Line state matches tx outputs if drivers enabled
+assign utmi_linestate_o = usb_tx_oen_o ? {rx_dn_q, rx_dp_q} : {usb_tx_dn_o, usb_tx_dp_o};
 
 //-----------------------------------------------------------------
 // State Machine
